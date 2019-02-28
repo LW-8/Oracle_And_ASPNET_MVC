@@ -1,0 +1,543 @@
+IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+THEN
+    CREATE TABLE __EFMigrationsHistory (
+        MigrationId nvarchar2(150) NOT NULL,
+        ProductVersion nvarchar2(32) NOT NULL,
+        CONSTRAINT PK___EFMigrationsHistory PRIMARY KEY (MigrationId)
+    );
+END IF;;
+
+ 
+
+CREATE TABLE ApiResources (
+    Id number(10) NOT NULL,
+    Enabled number(1) NOT NULL,
+    Name nvarchar2(200) NOT NULL,
+    DisplayName nvarchar2(200) NULL,
+    Description nvarchar2(1000) NULL,
+    Created datetime2 NOT NULL,
+    Updated datetime2 NULL,
+    LastAccessed datetime2 NULL,
+    NonEditable number(1) NOT NULL,
+    CONSTRAINT PK_ApiResources PRIMARY KEY (Id)
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ApiResources_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ApiResources_seq_tr
+ BEFORE INSERT ON ApiResources FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ApiResources_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE Clients (
+    Id number(10) NOT NULL,
+    Enabled number(1) NOT NULL,
+    ClientId nvarchar2(200) NOT NULL,
+    ProtocolType nvarchar2(200) NOT NULL,
+    RequireClientSecret number(1) NOT NULL,
+    ClientName nvarchar2(200) NULL,
+    Description nvarchar2(1000) NULL,
+    ClientUri nvarchar2(2000) NULL,
+    LogoUri nvarchar2(2000) NULL,
+    RequireConsent number(1) NOT NULL,
+    AllowRememberConsent number(1) NOT NULL,
+    AlwaysIncludeUserClaimsInIdToken number(1) NOT NULL,
+    RequirePkce number(1) NOT NULL,
+    AllowPlainTextPkce number(1) NOT NULL,
+    AllowAccessTokensViaBrowser number(1) NOT NULL,
+    FrontChannelLogoutUri nvarchar2(2000) NULL,
+    FrontChannelLogoutSessionRequired number(1) NOT NULL,
+    BackChannelLogoutUri nvarchar2(2000) NULL,
+    BackChannelLogoutSessionRequired number(1) NOT NULL,
+    AllowOfflineAccess number(1) NOT NULL,
+    IdentityTokenLifetime number(10) NOT NULL,
+    AccessTokenLifetime number(10) NOT NULL,
+    AuthorizationCodeLifetime number(10) NOT NULL,
+    ConsentLifetime number(10) NULL,
+    AbsoluteRefreshTokenLifetime number(10) NOT NULL,
+    SlidingRefreshTokenLifetime number(10) NOT NULL,
+    RefreshTokenUsage number(10) NOT NULL,
+    UpdateAccessTokenClaimsOnRefresh number(1) NOT NULL,
+    RefreshTokenExpiration number(10) NOT NULL,
+    AccessTokenType number(10) NOT NULL,
+    EnableLocalLogin number(1) NOT NULL,
+    IncludeJwtId number(1) NOT NULL,
+    AlwaysSendClientClaims number(1) NOT NULL,
+    ClientClaimsPrefix nvarchar2(200) NULL,
+    PairWiseSubjectSalt nvarchar2(200) NULL,
+    Created datetime2 NOT NULL,
+    Updated datetime2 NULL,
+    LastAccessed datetime2 NULL,
+    UserSsoLifetime number(10) NULL,
+    UserCodeType nvarchar2(100) NULL,
+    DeviceCodeLifetime number(10) NOT NULL,
+    NonEditable number(1) NOT NULL,
+    CONSTRAINT PK_Clients PRIMARY KEY (Id)
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE Clients_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER Clients_seq_tr
+ BEFORE INSERT ON Clients FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT Clients_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE IdentityResources (
+    Id number(10) NOT NULL,
+    Enabled number(1) NOT NULL,
+    Name nvarchar2(200) NOT NULL,
+    DisplayName nvarchar2(200) NULL,
+    Description nvarchar2(1000) NULL,
+    Required number(1) NOT NULL,
+    Emphasize number(1) NOT NULL,
+    ShowInDiscoveryDocument number(1) NOT NULL,
+    Created datetime2 NOT NULL,
+    Updated datetime2 NULL,
+    NonEditable number(1) NOT NULL,
+    CONSTRAINT PK_IdentityResources PRIMARY KEY (Id)
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE IdentityResources_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER IdentityResources_seq_tr
+ BEFORE INSERT ON IdentityResources FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT IdentityResources_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ApiClaims (
+    Id number(10) NOT NULL,
+    Type nvarchar2(200) NOT NULL,
+    ApiResourceId number(10) NOT NULL,
+    CONSTRAINT PK_ApiClaims PRIMARY KEY (Id),
+    CONSTRAINT FK_ApiClaims_ApiResources_ApiResourceId FOREIGN KEY (ApiResourceId) REFERENCES ApiResources (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ApiClaims_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ApiClaims_seq_tr
+ BEFORE INSERT ON ApiClaims FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ApiClaims_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ApiProperties (
+    Id number(10) NOT NULL,
+    Key nvarchar2(250) NOT NULL,
+    Value nvarchar2(2000) NOT NULL,
+    ApiResourceId number(10) NOT NULL,
+    CONSTRAINT PK_ApiProperties PRIMARY KEY (Id),
+    CONSTRAINT FK_ApiProperties_ApiResources_ApiResourceId FOREIGN KEY (ApiResourceId) REFERENCES ApiResources (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ApiProperties_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ApiProperties_seq_tr
+ BEFORE INSERT ON ApiProperties FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ApiProperties_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ApiScopes (
+    Id number(10) NOT NULL,
+    Name nvarchar2(200) NOT NULL,
+    DisplayName nvarchar2(200) NULL,
+    Description nvarchar2(1000) NULL,
+    Required number(1) NOT NULL,
+    Emphasize number(1) NOT NULL,
+    ShowInDiscoveryDocument number(1) NOT NULL,
+    ApiResourceId number(10) NOT NULL,
+    CONSTRAINT PK_ApiScopes PRIMARY KEY (Id),
+    CONSTRAINT FK_ApiScopes_ApiResources_ApiResourceId FOREIGN KEY (ApiResourceId) REFERENCES ApiResources (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ApiScopes_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ApiScopes_seq_tr
+ BEFORE INSERT ON ApiScopes FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ApiScopes_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ApiSecrets (
+    Id number(10) NOT NULL,
+    Description nvarchar2(1000) NULL,
+    Value nvarchar2(4000) NOT NULL,
+    Expiration datetime2 NULL,
+    Type nvarchar2(250) NOT NULL,
+    Created datetime2 NOT NULL,
+    ApiResourceId number(10) NOT NULL,
+    CONSTRAINT PK_ApiSecrets PRIMARY KEY (Id),
+    CONSTRAINT FK_ApiSecrets_ApiResources_ApiResourceId FOREIGN KEY (ApiResourceId) REFERENCES ApiResources (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ApiSecrets_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ApiSecrets_seq_tr
+ BEFORE INSERT ON ApiSecrets FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ApiSecrets_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ClientClaims (
+    Id number(10) NOT NULL,
+    Type nvarchar2(250) NOT NULL,
+    Value nvarchar2(250) NOT NULL,
+    ClientId number(10) NOT NULL,
+    CONSTRAINT PK_ClientClaims PRIMARY KEY (Id),
+    CONSTRAINT FK_ClientClaims_Clients_ClientId FOREIGN KEY (ClientId) REFERENCES Clients (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ClientClaims_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ClientClaims_seq_tr
+ BEFORE INSERT ON ClientClaims FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ClientClaims_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ClientCorsOrigins (
+    Id number(10) NOT NULL,
+    Origin nvarchar2(150) NOT NULL,
+    ClientId number(10) NOT NULL,
+    CONSTRAINT PK_ClientCorsOrigins PRIMARY KEY (Id),
+    CONSTRAINT FK_ClientCorsOrigins_Clients_ClientId FOREIGN KEY (ClientId) REFERENCES Clients (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ClientCorsOrigins_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ClientCorsOrigins_seq_tr
+ BEFORE INSERT ON ClientCorsOrigins FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ClientCorsOrigins_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ClientGrantTypes (
+    Id number(10) NOT NULL,
+    GrantType nvarchar2(250) NOT NULL,
+    ClientId number(10) NOT NULL,
+    CONSTRAINT PK_ClientGrantTypes PRIMARY KEY (Id),
+    CONSTRAINT FK_ClientGrantTypes_Clients_ClientId FOREIGN KEY (ClientId) REFERENCES Clients (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ClientGrantTypes_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ClientGrantTypes_seq_tr
+ BEFORE INSERT ON ClientGrantTypes FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ClientGrantTypes_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ClientIdPRestrictions (
+    Id number(10) NOT NULL,
+    Provider nvarchar2(200) NOT NULL,
+    ClientId number(10) NOT NULL,
+    CONSTRAINT PK_ClientIdPRestrictions PRIMARY KEY (Id),
+    CONSTRAINT FK_ClientIdPRestrictions_Clients_ClientId FOREIGN KEY (ClientId) REFERENCES Clients (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ClientIdPRestrictions_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ClientIdPRestrictions_seq_tr
+ BEFORE INSERT ON ClientIdPRestrictions FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ClientIdPRestrictions_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ClientPostLogoutRedirectUris (
+    Id number(10) NOT NULL,
+    PostLogoutRedirectUri nvarchar2(2000) NOT NULL,
+    ClientId number(10) NOT NULL,
+    CONSTRAINT PK_ClientPostLogoutRedirectUris PRIMARY KEY (Id),
+    CONSTRAINT FK_ClientPostLogoutRedirectUris_Clients_ClientId FOREIGN KEY (ClientId) REFERENCES Clients (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ClientPostLogoutRedirectUris_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ClientPostLogoutRedirectUris_seq_tr
+ BEFORE INSERT ON ClientPostLogoutRedirectUris FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ClientPostLogoutRedirectUris_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ClientProperties (
+    Id number(10) NOT NULL,
+    Key nvarchar2(250) NOT NULL,
+    Value nvarchar2(2000) NOT NULL,
+    ClientId number(10) NOT NULL,
+    CONSTRAINT PK_ClientProperties PRIMARY KEY (Id),
+    CONSTRAINT FK_ClientProperties_Clients_ClientId FOREIGN KEY (ClientId) REFERENCES Clients (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ClientProperties_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ClientProperties_seq_tr
+ BEFORE INSERT ON ClientProperties FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ClientProperties_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ClientRedirectUris (
+    Id number(10) NOT NULL,
+    RedirectUri nvarchar2(2000) NOT NULL,
+    ClientId number(10) NOT NULL,
+    CONSTRAINT PK_ClientRedirectUris PRIMARY KEY (Id),
+    CONSTRAINT FK_ClientRedirectUris_Clients_ClientId FOREIGN KEY (ClientId) REFERENCES Clients (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ClientRedirectUris_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ClientRedirectUris_seq_tr
+ BEFORE INSERT ON ClientRedirectUris FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ClientRedirectUris_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ClientScopes (
+    Id number(10) NOT NULL,
+    Scope nvarchar2(200) NOT NULL,
+    ClientId number(10) NOT NULL,
+    CONSTRAINT PK_ClientScopes PRIMARY KEY (Id),
+    CONSTRAINT FK_ClientScopes_Clients_ClientId FOREIGN KEY (ClientId) REFERENCES Clients (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ClientScopes_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ClientScopes_seq_tr
+ BEFORE INSERT ON ClientScopes FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ClientScopes_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ClientSecrets (
+    Id number(10) NOT NULL,
+    Description nvarchar2(2000) NULL,
+    Value nvarchar2(4000) NOT NULL,
+    Expiration datetime2 NULL,
+    Type nvarchar2(250) NOT NULL,
+    Created datetime2 NOT NULL,
+    ClientId number(10) NOT NULL,
+    CONSTRAINT PK_ClientSecrets PRIMARY KEY (Id),
+    CONSTRAINT FK_ClientSecrets_Clients_ClientId FOREIGN KEY (ClientId) REFERENCES Clients (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ClientSecrets_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ClientSecrets_seq_tr
+ BEFORE INSERT ON ClientSecrets FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ClientSecrets_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE IdentityClaims (
+    Id number(10) NOT NULL,
+    Type nvarchar2(200) NOT NULL,
+    IdentityResourceId number(10) NOT NULL,
+    CONSTRAINT PK_IdentityClaims PRIMARY KEY (Id),
+    CONSTRAINT FK_IdentityClaims_IdentityResources_IdentityResourceId FOREIGN KEY (IdentityResourceId) REFERENCES IdentityResources (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE IdentityClaims_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER IdentityClaims_seq_tr
+ BEFORE INSERT ON IdentityClaims FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT IdentityClaims_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE IdentityProperties (
+    Id number(10) NOT NULL,
+    Key nvarchar2(250) NOT NULL,
+    Value nvarchar2(2000) NOT NULL,
+    IdentityResourceId number(10) NOT NULL,
+    CONSTRAINT PK_IdentityProperties PRIMARY KEY (Id),
+    CONSTRAINT FK_IdentityProperties_IdentityResources_IdentityResourceId FOREIGN KEY (IdentityResourceId) REFERENCES IdentityResources (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE IdentityProperties_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER IdentityProperties_seq_tr
+ BEFORE INSERT ON IdentityProperties FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT IdentityProperties_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE TABLE ApiScopeClaims (
+    Id number(10) NOT NULL,
+    Type nvarchar2(200) NOT NULL,
+    ApiScopeId number(10) NOT NULL,
+    CONSTRAINT PK_ApiScopeClaims PRIMARY KEY (Id),
+    CONSTRAINT FK_ApiScopeClaims_ApiScopes_ApiScopeId FOREIGN KEY (ApiScopeId) REFERENCES ApiScopes (Id) ON DELETE CASCADE
+);
+
+
+-- Generate ID using sequence and trigger
+CREATE SEQUENCE ApiScopeClaims_seq START WITH 1 INCREMENT BY 1;
+
+CREATE OR REPLACE TRIGGER ApiScopeClaims_seq_tr
+ BEFORE INSERT ON ApiScopeClaims FOR EACH ROW
+ WHEN (NEW.Id IS NULL)
+BEGIN
+ SELECT ApiScopeClaims_seq.NEXTVAL INTO :NEW.Id FROM DUAL;
+END;
+/
+
+CREATE INDEX IX_ApiClaims_ApiResourceId ON ApiClaims (ApiResourceId);
+
+ 
+
+CREATE INDEX IX_ApiProperties_ApiResourceId ON ApiProperties (ApiResourceId);
+
+ 
+
+CREATE UNIQUE INDEX IX_ApiResources_Name ON ApiResources (Name);
+
+ 
+
+CREATE INDEX IX_ApiScopeClaims_ApiScopeId ON ApiScopeClaims (ApiScopeId);
+
+ 
+
+CREATE INDEX IX_ApiScopes_ApiResourceId ON ApiScopes (ApiResourceId);
+
+ 
+
+CREATE UNIQUE INDEX IX_ApiScopes_Name ON ApiScopes (Name);
+
+ 
+
+CREATE INDEX IX_ApiSecrets_ApiResourceId ON ApiSecrets (ApiResourceId);
+
+ 
+
+CREATE INDEX IX_ClientClaims_ClientId ON ClientClaims (ClientId);
+
+ 
+
+CREATE INDEX IX_ClientCorsOrigins_ClientId ON ClientCorsOrigins (ClientId);
+
+ 
+
+CREATE INDEX IX_ClientGrantTypes_ClientId ON ClientGrantTypes (ClientId);
+
+ 
+
+CREATE INDEX IX_ClientIdPRestrictions_ClientId ON ClientIdPRestrictions (ClientId);
+
+ 
+
+CREATE INDEX IX_ClientPostLogoutRedirectUris_ClientId ON ClientPostLogoutRedirectUris (ClientId);
+
+ 
+
+CREATE INDEX IX_ClientProperties_ClientId ON ClientProperties (ClientId);
+
+ 
+
+CREATE INDEX IX_ClientRedirectUris_ClientId ON ClientRedirectUris (ClientId);
+
+ 
+
+CREATE UNIQUE INDEX IX_Clients_ClientId ON Clients (ClientId);
+
+ 
+
+CREATE INDEX IX_ClientScopes_ClientId ON ClientScopes (ClientId);
+
+ 
+
+CREATE INDEX IX_ClientSecrets_ClientId ON ClientSecrets (ClientId);
+
+ 
+
+CREATE INDEX IX_IdentityClaims_IdentityResourceId ON IdentityClaims (IdentityResourceId);
+
+ 
+
+CREATE INDEX IX_IdentityProperties_IdentityResourceId ON IdentityProperties (IdentityResourceId);
+
+ 
+
+CREATE UNIQUE INDEX IX_IdentityResources_Name ON IdentityResources (Name);
+
+ 
+
+INSERT INTO __EFMigrationsHistory (MigrationId, ProductVersion)
+VALUES (N'20181129175524_Config', N'2.1.4-rtm-31024');
+
+ 
+
